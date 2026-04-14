@@ -1,0 +1,697 @@
+mixed-port: 7893
+allow-lan: false
+mode: rule
+log-level: warning
+ipv6: false
+unified-delay: false
+tcp-concurrent: true
+find-process-mode: off
+global-client-fingerprint: chrome
+external-controller: 127.0.0.1:9090
+secret: ''
+profile:
+  store-selected: true
+  store-fake-ip: true
+geodata-mode: true
+geodata-loader: standard
+geox-url:
+  geoip: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
+  geosite: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
+  mmdb: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
+sniffer:
+  enable: true
+  sniff:
+    HTTP:
+      ports:
+      - 80
+      - 8080-8880
+      override-destination: true
+    TLS:
+      ports:
+      - 443
+      - 8443
+    QUIC:
+      ports:
+      - 443
+      - 8443
+  skip-domain:
+  - Mijia Cloud
+  - dlg.io.mi.com
+  - +.push.apple.com
+  force-domain:
+  - +.v2ex.com
+  - +.netflix.com
+  - +.nflxvideo.net
+  - +.disney.com
+  - +.disneyplus.com
+# =============================================
+# 本地节点 - 在此处添加手动配置的节点
+# 格式参考: https://wiki.metacubex.one/config/proxies/
+# =============================================
+proxies:
+- name: vl-reality-racknerd-45a0d2a
+  type: vless
+  server: 75.127.15.156
+  port: 57188
+  uuid: <REDACTED_UUID>
+  network: tcp
+  udp: true
+  tls: true
+  servername: apple.com
+  flow: xtls-rprx-vision
+  client-fingerprint: chrome
+  reality-opts:
+    public-key: Q31X0WtSclVwArg4A-6OeukUUPsUrRZLBNK73KusPlk
+    short-id: 7c39c224
+  packet-encoding: xudp
+- name: vm-argo-racknerd-45a0d2a
+  type: vmess
+  server: www.visa.com.sg
+  port: 8443
+  uuid: <REDACTED_UUID>
+  alterId: 0
+  cipher: none
+  udp: true
+  tls: true
+  network: ws
+  client-fingerprint: chrome
+  ws-opts:
+    path: /<REDACTED_UUID>-vm
+    headers: {}
+- name: vm-ws-racknerd-45a0d2a
+  type: vmess
+  server: 75.127.15.156
+  port: 2082
+  uuid: <REDACTED_UUID>
+  alterId: 0
+  cipher: none
+  udp: true
+  network: ws
+  ws-opts:
+    path: /<REDACTED_UUID>-vm
+    headers:
+      Host: www.bing.com
+- name: hy2-racknerd-45a0d2a
+  type: hysteria2
+  server: 75.127.15.156
+  port: 46787
+  password: <REDACTED>
+  udp: true
+  sni: www.bing.com
+  skip-cert-verify: true
+  alpn:
+  - h3
+- name: tu5-racknerd-45a0d2a
+  type: tuic
+  server: 75.127.15.156
+  port: 58809
+  uuid: <REDACTED_UUID>
+  password: <REDACTED>
+  udp: true
+  sni: www.bing.com
+  alpn:
+  - h3
+  congestion-controller: bbr
+  udp-relay-mode: native
+  skip-cert-verify: true
+- name: anytls-racknerd-45a0d2a
+  type: anytls
+  server: 75.127.15.156
+  port: 17069
+  password: <REDACTED>
+  udp: true
+  sni: www.bing.com
+  skip-cert-verify: true
+- name: s2-reality-pseudoctor
+  type: vless
+  server: 213.189.58.89
+  port: 61707
+  uuid: <REDACTED_UUID>
+  network: tcp
+  udp: true
+  tls: true
+  servername: <REDACTED_SERVERNAME>
+  flow: xtls-rprx-vision
+  client-fingerprint: chrome
+  reality-opts:
+    public-key: 8kwopyxhvaGr7GszV1YH_C3veP3EXnkltn9_qQIDk18
+  packet-encoding: xudp
+- name: s2-vmess-ws-pseudoctor
+  type: vmess
+  server: 213.189.58.89
+  port: 63668
+  uuid: <REDACTED_UUID>
+  alterId: 0
+  cipher: none
+  udp: true
+  network: ws
+  ws-opts:
+    path: /<REDACTED_UUID>-vm?ed=2048
+    headers: {}
+- name: s2-vmess-ws-tls-argo-pseudoctor
+  type: vmess
+  server: www.visa.com.hk
+  port: 8443
+  uuid: <REDACTED_UUID>
+  alterId: 0
+  cipher: none
+  udp: true
+  tls: true
+  servername: updated-arrangement-massachusetts-mailing.trycloudflare.com
+  network: ws
+  ws-opts:
+    path: /<REDACTED_UUID>-vm?ed=2048
+    headers:
+      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
+- name: s2-vmess-ws-argo-pseudoctor
+  type: vmess
+  server: www.visa.com.hk
+  port: 8880
+  uuid: <REDACTED_UUID>
+  alterId: 0
+  cipher: none
+  udp: true
+  network: ws
+  ws-opts:
+    path: /<REDACTED_UUID>-vm?ed=2048
+    headers:
+      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
+- name: s2-hy2-pseudoctor
+  type: hysteria2
+  server: 213.189.58.89
+  port: 48362
+  password: <REDACTED>
+  udp: true
+  sni: www.bing.com
+  skip-cert-verify: true
+  alpn:
+  - h3
+- name: s2-reality-pseudoctor-213.189.54.223
+  type: vless
+  server: 213.189.54.223
+  port: 61707
+  uuid: <REDACTED_UUID>
+  network: tcp
+  udp: true
+  tls: true
+  servername: <REDACTED_SERVERNAME>
+  flow: xtls-rprx-vision
+  client-fingerprint: chrome
+  reality-opts:
+    public-key: 8kwopyxhvaGr7GszV1YH_C3veP3EXnkltn9_qQIDk18
+  packet-encoding: xudp
+- name: s2-vmess-ws-pseudoctor-213.189.54.223
+  type: vmess
+  server: 213.189.54.223
+  port: 63668
+  uuid: <REDACTED_UUID>
+  alterId: 0
+  cipher: none
+  udp: true
+  network: ws
+  tls: false
+  ws-opts:
+    path: /<REDACTED_UUID>-vm
+- name: s2-hy2-pseudoctor-213.189.54.223
+  type: hysteria2
+  server: 213.189.54.223
+  port: 48362
+  password: <REDACTED>
+  udp: true
+  sni: www.bing.com
+  skip-cert-verify: true
+  alpn:
+  - h3
+- name: s2-reality-pseudoctor-213.189.54.237
+  type: vless
+  server: 213.189.54.237
+  port: 61707
+  uuid: <REDACTED_UUID>
+  network: tcp
+  udp: true
+  tls: true
+  servername: <REDACTED_SERVERNAME>
+  flow: xtls-rprx-vision
+  client-fingerprint: chrome
+  reality-opts:
+    public-key: 8kwopyxhvaGr7GszV1YH_C3veP3EXnkltn9_qQIDk18
+  packet-encoding: xudp
+- name: s2-vmess-ws-pseudoctor-213.189.54.237
+  type: vmess
+  server: 213.189.54.237
+  port: 63668
+  uuid: <REDACTED_UUID>
+  alterId: 0
+  cipher: none
+  udp: true
+  network: ws
+  tls: false
+  ws-opts:
+    path: /<REDACTED_UUID>-vm
+- name: s2-hy2-pseudoctor-213.189.54.237
+  type: hysteria2
+  server: 213.189.54.237
+  port: 48362
+  password: <REDACTED>
+  udp: true
+  sni: www.bing.com
+  skip-cert-verify: true
+  alpn:
+  - h3
+- name: s2-vmess-ws-tls-argo-pseudoctor-443
+  type: vmess
+  server: 104.16.0.0
+  port: 443
+  uuid: <REDACTED_UUID>
+  alterId: 0
+  cipher: none
+  udp: true
+  network: ws
+  tls: true
+  servername: updated-arrangement-massachusetts-mailing.trycloudflare.com
+  ws-opts:
+    path: /<REDACTED_UUID>-vm
+    headers:
+      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
+- name: s2-vmess-ws-tls-argo-pseudoctor-2053
+  type: vmess
+  server: 104.17.0.0
+  port: 2053
+  uuid: <REDACTED_UUID>
+  alterId: 0
+  cipher: none
+  udp: true
+  network: ws
+  tls: true
+  servername: updated-arrangement-massachusetts-mailing.trycloudflare.com
+  ws-opts:
+    path: /<REDACTED_UUID>-vm
+    headers:
+      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
+- name: s2-vmess-ws-tls-argo-pseudoctor-2083
+  type: vmess
+  server: 104.18.0.0
+  port: 2083
+  uuid: <REDACTED_UUID>
+  alterId: 0
+  cipher: none
+  udp: true
+  network: ws
+  tls: true
+  servername: updated-arrangement-massachusetts-mailing.trycloudflare.com
+  ws-opts:
+    path: /<REDACTED_UUID>-vm
+    headers:
+      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
+- name: s2-vmess-ws-argo-pseudoctor-2052
+  type: vmess
+  server: 104.24.0.0
+  port: 2052
+  uuid: <REDACTED_UUID>
+  alterId: 0
+  cipher: none
+  udp: true
+  network: ws
+  tls: false
+  ws-opts:
+    path: /<REDACTED_UUID>-vm
+    headers:
+      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
+- name: s2-vmess-ws-argo-pseudoctor-2082
+  type: vmess
+  server: 104.25.0.0
+  port: 2082
+  uuid: <REDACTED_UUID>
+  alterId: 0
+  cipher: none
+  udp: true
+  network: ws
+  tls: false
+  ws-opts:
+    path: /<REDACTED_UUID>-vm
+    headers:
+      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
+- name: s2-vmess-ws-argo-pseudoctor-2086
+  type: vmess
+  server: 104.26.0.0
+  port: 2086
+  uuid: <REDACTED_UUID>
+  alterId: 0
+  cipher: none
+  udp: true
+  network: ws
+  tls: false
+  ws-opts:
+    path: /<REDACTED_UUID>-vm
+    headers:
+      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
+- name: s2-vmess-ws-argo-pseudoctor-2095
+  type: vmess
+  server: 104.27.0.0
+  port: 2095
+  uuid: <REDACTED_UUID>
+  alterId: 0
+  cipher: none
+  udp: true
+  network: ws
+  tls: false
+  ws-opts:
+    path: /<REDACTED_UUID>-vm
+    headers:
+      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
+# =============================================
+# 机场订阅 - 在此处添加机场订阅链接
+# 添加新订阅后无需修改其他位置，include-all-providers 会自动引入
+# =============================================
+proxy-providers:
+  PQ2025:
+    type: http
+    url: "<REDACTED_SUBSCRIPTION_URL>"
+    path: ./proxies/pq2025.yaml
+    interval: 86400
+    health-check:
+      enable: true
+      url: https://www.gstatic.com/generate_204
+      interval: 600
+      lazy: true
+  HostUNO:
+    type: http
+    url: "<REDACTED_SUBSCRIPTION_URL>"
+    path: ./proxies/hostuno.yaml
+    interval: 86400
+    override:
+      additional-prefix: "[PL] "
+    health-check:
+      enable: true
+      url: https://www.gstatic.com/generate_204
+      interval: 600
+      lazy: true
+
+proxy-groups:
+- name: 节点选择
+  type: select
+  include-all: true
+  include-all-providers: true
+  proxies:
+  - 自动选择
+  - 故障转移
+  - 负载均衡
+  - 直连
+- name: 自动选择
+  type: url-test
+  include-all: true
+  include-all-providers: true
+  url: https://www.gstatic.com/generate_204
+  interval: 300
+  tolerance: 50
+  lazy: true
+- name: 故障转移
+  type: fallback
+  include-all: true
+  include-all-providers: true
+  url: https://www.gstatic.com/generate_204
+  interval: 300
+  lazy: true
+- name: 负载均衡
+  type: load-balance
+  strategy: consistent-hashing
+  include-all: true
+  include-all-providers: true
+  url: https://www.gstatic.com/generate_204
+  interval: 300
+  lazy: true
+# ---- 地区分组（按节点名自动匹配）----
+- name: 🇺🇸 美国
+  type: url-test
+  include-all: true
+  include-all-providers: true
+  filter: "(?i)US|美国|United States|洛杉矶|硅谷|达拉斯|西雅图|纽约|racknerd"
+  url: https://www.gstatic.com/generate_204
+  interval: 600
+  tolerance: 50
+  lazy: true
+- name: 🇭🇰 香港
+  type: url-test
+  include-all: true
+  include-all-providers: true
+  filter: "(?i)HK|香港|Hong Kong"
+  url: https://www.gstatic.com/generate_204
+  interval: 600
+  tolerance: 50
+  lazy: true
+- name: 🇯🇵 日本
+  type: url-test
+  include-all: true
+  include-all-providers: true
+  filter: "(?i)JP|日本|Japan|东京|大阪"
+  url: https://www.gstatic.com/generate_204
+  interval: 600
+  tolerance: 50
+  lazy: true
+- name: 🇸🇬 新加坡
+  type: url-test
+  include-all: true
+  include-all-providers: true
+  filter: "(?i)SG|新加坡|Singapore"
+  url: https://www.gstatic.com/generate_204
+  interval: 600
+  tolerance: 50
+  lazy: true
+- name: 🇹🇼 台湾
+  type: url-test
+  include-all: true
+  include-all-providers: true
+  filter: "(?i)TW|台湾|Taiwan"
+  url: https://www.gstatic.com/generate_204
+  interval: 600
+  tolerance: 50
+  lazy: true
+- name: 🇬🇧 英国
+  type: url-test
+  include-all: true
+  include-all-providers: true
+  filter: "(?i)UK|GB|英国|United Kingdom|伦敦"
+  url: https://www.gstatic.com/generate_204
+  interval: 600
+  tolerance: 50
+  lazy: true
+- name: 🇰🇷 韩国
+  type: url-test
+  include-all: true
+  include-all-providers: true
+  filter: "(?i)KR|韩国|Korea|首尔"
+  url: https://www.gstatic.com/generate_204
+  interval: 600
+  tolerance: 50
+  lazy: true
+- name: 🇵🇱 波兰
+  type: url-test
+  include-all: true
+  include-all-providers: true
+  filter: "(?i)PL|波兰|Poland|华沙"
+  url: https://www.gstatic.com/generate_204
+  interval: 600
+  tolerance: 50
+  lazy: true
+# ---- 服务分组 ----
+- name: AI服务
+  type: select
+  proxies:
+  - 🇺🇸 美国
+  - 节点选择
+  - 自动选择
+  - 直连
+- name: 流媒体
+  type: select
+  proxies:
+  - 节点选择
+  - 🇭🇰 香港
+  - 🇺🇸 美国
+  - 🇯🇵 日本
+  - 🇸🇬 新加坡
+  - 🇹🇼 台湾
+  - 自动选择
+  - 直连
+- name: 国外网站
+  type: select
+  proxies:
+  - 节点选择
+  - 🇺🇸 美国
+  - 🇭🇰 香港
+  - 🇯🇵 日本
+  - 🇸🇬 新加坡
+  - 自动选择
+  - 直连
+- name: 国内网站
+  type: select
+  proxies:
+  - 直连
+  - 节点选择
+- name: 漏网之鱼
+  type: select
+  proxies:
+  - 节点选择
+  - 自动选择
+  - 直连
+- name: 广告拦截
+  type: select
+  proxies:
+  - REJECT
+  - 直连
+- name: 直连
+  type: select
+  proxies:
+  - DIRECT
+rule-providers:
+  reject:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.yaml
+    path: ./ruleset/reject.yaml
+    interval: 86400
+  openai:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.yaml
+    path: ./ruleset/openai.yaml
+    interval: 86400
+  ai:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-!cn.yaml
+    path: ./ruleset/ai.yaml
+    interval: 86400
+  netflix:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.yaml
+    path: ./ruleset/netflix.yaml
+    interval: 86400
+  disney:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/disney.yaml
+    path: ./ruleset/disney.yaml
+    interval: 86400
+  youtube:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.yaml
+    path: ./ruleset/youtube.yaml
+    interval: 86400
+  telegram:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.yaml
+    path: ./ruleset/telegram.yaml
+    interval: 86400
+  twitter:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/twitter.yaml
+    path: ./ruleset/twitter.yaml
+    interval: 86400
+  facebook:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/facebook.yaml
+    path: ./ruleset/facebook.yaml
+    interval: 86400
+  github:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.yaml
+    path: ./ruleset/github.yaml
+    interval: 86400
+  spotify:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/spotify.yaml
+    path: ./ruleset/spotify.yaml
+    interval: 86400
+  tiktok:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.yaml
+    path: ./ruleset/tiktok.yaml
+    interval: 86400
+  apple:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.yaml
+    path: ./ruleset/apple.yaml
+    interval: 86400
+  microsoft:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.yaml
+    path: ./ruleset/microsoft.yaml
+    interval: 86400
+  bilibili:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bilibili.yaml
+    path: ./ruleset/bilibili.yaml
+    interval: 86400
+rules:
+- RULE-SET,reject,广告拦截
+- RULE-SET,openai,AI服务
+- RULE-SET,ai,AI服务
+- RULE-SET,netflix,流媒体
+- RULE-SET,disney,流媒体
+- RULE-SET,youtube,流媒体
+- RULE-SET,spotify,流媒体
+- RULE-SET,bilibili,国内网站
+- RULE-SET,tiktok,国外网站
+- RULE-SET,telegram,国外网站
+- RULE-SET,twitter,国外网站
+- RULE-SET,facebook,国外网站
+- RULE-SET,github,国外网站
+- RULE-SET,microsoft,国外网站
+- RULE-SET,apple,直连
+- GEOIP,LAN,直连,no-resolve
+- GEOSITE,CN,国内网站
+- GEOIP,CN,国内网站,no-resolve
+- MATCH,漏网之鱼
+dns:
+  enable: true
+  ipv6: false
+  listen: 0.0.0.0:1053
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  use-hosts: true
+  fake-ip-filter:
+  - "*.lan"
+  - "*.local"
+  - "+.msftconnecttest.com"
+  - "+.msftncsi.com"
+  - "+.srv.nintendo.net"
+  - "+.stun.playstation.net"
+  - "+.xboxlive.com"
+  - "+.pool.ntp.org"
+  - "+.ntp.org.cn"
+  - "time.*.com"
+  - "time.*.gov"
+  - "+.push.apple.com"
+  - "+.cmpassport.com"
+  nameserver:
+  - https://dns.alidns.com/dns-query
+  - https://doh.pub/dns-query
+  nameserver-policy:
+    "geosite:private":
+    - https://dns.alidns.com/dns-query
