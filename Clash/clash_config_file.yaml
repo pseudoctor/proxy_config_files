@@ -45,342 +45,31 @@ sniffer:
   - +.disney.com
   - +.disneyplus.com
 # =============================================
-# 本地节点 - 在此处添加手动配置的节点
-# 格式参考: https://wiki.metacubex.one/config/proxies/
+# 本地节点（可选）
+# 如只使用机场订阅，可保持为空
 # =============================================
-proxies:
-- name: vl-reality-racknerd-45a0d2a
-  type: vless
-  server: 75.127.15.156
-  port: 57188
-  uuid: <REDACTED_UUID>
-  network: tcp
-  udp: true
-  tls: true
-  servername: apple.com
-  flow: xtls-rprx-vision
-  client-fingerprint: chrome
-  reality-opts:
-    public-key: Q31X0WtSclVwArg4A-6OeukUUPsUrRZLBNK73KusPlk
-    short-id: 7c39c224
-  packet-encoding: xudp
-- name: vm-argo-racknerd-45a0d2a
-  type: vmess
-  server: www.visa.com.sg
-  port: 8443
-  uuid: <REDACTED_UUID>
-  alterId: 0
-  cipher: none
-  udp: true
-  tls: true
-  network: ws
-  client-fingerprint: chrome
-  ws-opts:
-    path: /<REDACTED_UUID>-vm
-    headers: {}
-- name: vm-ws-racknerd-45a0d2a
-  type: vmess
-  server: 75.127.15.156
-  port: 2082
-  uuid: <REDACTED_UUID>
-  alterId: 0
-  cipher: none
-  udp: true
-  network: ws
-  ws-opts:
-    path: /<REDACTED_UUID>-vm
-    headers:
-      Host: www.bing.com
-- name: hy2-racknerd-45a0d2a
-  type: hysteria2
-  server: 75.127.15.156
-  port: 46787
-  password: <REDACTED>
-  udp: true
-  sni: www.bing.com
-  skip-cert-verify: true
-  alpn:
-  - h3
-- name: tu5-racknerd-45a0d2a
-  type: tuic
-  server: 75.127.15.156
-  port: 58809
-  uuid: <REDACTED_UUID>
-  password: <REDACTED>
-  udp: true
-  sni: www.bing.com
-  alpn:
-  - h3
-  congestion-controller: bbr
-  udp-relay-mode: native
-  skip-cert-verify: true
-- name: anytls-racknerd-45a0d2a
-  type: anytls
-  server: 75.127.15.156
-  port: 17069
-  password: <REDACTED>
-  udp: true
-  sni: www.bing.com
-  skip-cert-verify: true
-- name: s2-reality-pseudoctor
-  type: vless
-  server: 213.189.58.89
-  port: 61707
-  uuid: <REDACTED_UUID>
-  network: tcp
-  udp: true
-  tls: true
-  servername: <REDACTED_SERVERNAME>
-  flow: xtls-rprx-vision
-  client-fingerprint: chrome
-  reality-opts:
-    public-key: 8kwopyxhvaGr7GszV1YH_C3veP3EXnkltn9_qQIDk18
-  packet-encoding: xudp
-- name: s2-vmess-ws-pseudoctor
-  type: vmess
-  server: 213.189.58.89
-  port: 63668
-  uuid: <REDACTED_UUID>
-  alterId: 0
-  cipher: none
-  udp: true
-  network: ws
-  ws-opts:
-    path: /<REDACTED_UUID>-vm?ed=2048
-    headers: {}
-- name: s2-vmess-ws-tls-argo-pseudoctor
-  type: vmess
-  server: www.visa.com.hk
-  port: 8443
-  uuid: <REDACTED_UUID>
-  alterId: 0
-  cipher: none
-  udp: true
-  tls: true
-  servername: updated-arrangement-massachusetts-mailing.trycloudflare.com
-  network: ws
-  ws-opts:
-    path: /<REDACTED_UUID>-vm?ed=2048
-    headers:
-      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
-- name: s2-vmess-ws-argo-pseudoctor
-  type: vmess
-  server: www.visa.com.hk
-  port: 8880
-  uuid: <REDACTED_UUID>
-  alterId: 0
-  cipher: none
-  udp: true
-  network: ws
-  ws-opts:
-    path: /<REDACTED_UUID>-vm?ed=2048
-    headers:
-      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
-- name: s2-hy2-pseudoctor
-  type: hysteria2
-  server: 213.189.58.89
-  port: 48362
-  password: <REDACTED>
-  udp: true
-  sni: www.bing.com
-  skip-cert-verify: true
-  alpn:
-  - h3
-- name: s2-reality-pseudoctor-213.189.54.223
-  type: vless
-  server: 213.189.54.223
-  port: 61707
-  uuid: <REDACTED_UUID>
-  network: tcp
-  udp: true
-  tls: true
-  servername: <REDACTED_SERVERNAME>
-  flow: xtls-rprx-vision
-  client-fingerprint: chrome
-  reality-opts:
-    public-key: 8kwopyxhvaGr7GszV1YH_C3veP3EXnkltn9_qQIDk18
-  packet-encoding: xudp
-- name: s2-vmess-ws-pseudoctor-213.189.54.223
-  type: vmess
-  server: 213.189.54.223
-  port: 63668
-  uuid: <REDACTED_UUID>
-  alterId: 0
-  cipher: none
-  udp: true
-  network: ws
-  tls: false
-  ws-opts:
-    path: /<REDACTED_UUID>-vm
-- name: s2-hy2-pseudoctor-213.189.54.223
-  type: hysteria2
-  server: 213.189.54.223
-  port: 48362
-  password: <REDACTED>
-  udp: true
-  sni: www.bing.com
-  skip-cert-verify: true
-  alpn:
-  - h3
-- name: s2-reality-pseudoctor-213.189.54.237
-  type: vless
-  server: 213.189.54.237
-  port: 61707
-  uuid: <REDACTED_UUID>
-  network: tcp
-  udp: true
-  tls: true
-  servername: <REDACTED_SERVERNAME>
-  flow: xtls-rprx-vision
-  client-fingerprint: chrome
-  reality-opts:
-    public-key: 8kwopyxhvaGr7GszV1YH_C3veP3EXnkltn9_qQIDk18
-  packet-encoding: xudp
-- name: s2-vmess-ws-pseudoctor-213.189.54.237
-  type: vmess
-  server: 213.189.54.237
-  port: 63668
-  uuid: <REDACTED_UUID>
-  alterId: 0
-  cipher: none
-  udp: true
-  network: ws
-  tls: false
-  ws-opts:
-    path: /<REDACTED_UUID>-vm
-- name: s2-hy2-pseudoctor-213.189.54.237
-  type: hysteria2
-  server: 213.189.54.237
-  port: 48362
-  password: <REDACTED>
-  udp: true
-  sni: www.bing.com
-  skip-cert-verify: true
-  alpn:
-  - h3
-- name: s2-vmess-ws-tls-argo-pseudoctor-443
-  type: vmess
-  server: 104.16.0.0
-  port: 443
-  uuid: <REDACTED_UUID>
-  alterId: 0
-  cipher: none
-  udp: true
-  network: ws
-  tls: true
-  servername: updated-arrangement-massachusetts-mailing.trycloudflare.com
-  ws-opts:
-    path: /<REDACTED_UUID>-vm
-    headers:
-      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
-- name: s2-vmess-ws-tls-argo-pseudoctor-2053
-  type: vmess
-  server: 104.17.0.0
-  port: 2053
-  uuid: <REDACTED_UUID>
-  alterId: 0
-  cipher: none
-  udp: true
-  network: ws
-  tls: true
-  servername: updated-arrangement-massachusetts-mailing.trycloudflare.com
-  ws-opts:
-    path: /<REDACTED_UUID>-vm
-    headers:
-      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
-- name: s2-vmess-ws-tls-argo-pseudoctor-2083
-  type: vmess
-  server: 104.18.0.0
-  port: 2083
-  uuid: <REDACTED_UUID>
-  alterId: 0
-  cipher: none
-  udp: true
-  network: ws
-  tls: true
-  servername: updated-arrangement-massachusetts-mailing.trycloudflare.com
-  ws-opts:
-    path: /<REDACTED_UUID>-vm
-    headers:
-      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
-- name: s2-vmess-ws-argo-pseudoctor-2052
-  type: vmess
-  server: 104.24.0.0
-  port: 2052
-  uuid: <REDACTED_UUID>
-  alterId: 0
-  cipher: none
-  udp: true
-  network: ws
-  tls: false
-  ws-opts:
-    path: /<REDACTED_UUID>-vm
-    headers:
-      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
-- name: s2-vmess-ws-argo-pseudoctor-2082
-  type: vmess
-  server: 104.25.0.0
-  port: 2082
-  uuid: <REDACTED_UUID>
-  alterId: 0
-  cipher: none
-  udp: true
-  network: ws
-  tls: false
-  ws-opts:
-    path: /<REDACTED_UUID>-vm
-    headers:
-      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
-- name: s2-vmess-ws-argo-pseudoctor-2086
-  type: vmess
-  server: 104.26.0.0
-  port: 2086
-  uuid: <REDACTED_UUID>
-  alterId: 0
-  cipher: none
-  udp: true
-  network: ws
-  tls: false
-  ws-opts:
-    path: /<REDACTED_UUID>-vm
-    headers:
-      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
-- name: s2-vmess-ws-argo-pseudoctor-2095
-  type: vmess
-  server: 104.27.0.0
-  port: 2095
-  uuid: <REDACTED_UUID>
-  alterId: 0
-  cipher: none
-  udp: true
-  network: ws
-  tls: false
-  ws-opts:
-    path: /<REDACTED_UUID>-vm
-    headers:
-      Host: updated-arrangement-massachusetts-mailing.trycloudflare.com
+proxies: []
 # =============================================
 # 机场订阅 - 在此处添加机场订阅链接
 # 添加新订阅后无需修改其他位置，include-all-providers 会自动引入
 # =============================================
 proxy-providers:
-  PQ2025:
+  Provider1:
     type: http
-    url: "<REDACTED_SUBSCRIPTION_URL>"
-    path: ./proxies/pq2025.yaml
+    # 粘贴你的订阅链接到这里
+    url: "https://REPLACE_ME_SUBSCRIPTION_URL"
+    path: ./proxies/provider1.yaml
     interval: 86400
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
       interval: 600
       lazy: true
-  HostUNO:
+  Provider2:
     type: http
-    url: "<REDACTED_SUBSCRIPTION_URL>"
-    path: ./proxies/hostuno.yaml
+    url: "https://REPLACE_ME_SUBSCRIPTION_URL"
+    path: ./proxies/provider2.yaml
     interval: 86400
-    override:
-      additional-prefix: "[PL] "
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
@@ -425,7 +114,7 @@ proxy-groups:
   type: url-test
   include-all: true
   include-all-providers: true
-  filter: "(?i)US|美国|United States|洛杉矶|硅谷|达拉斯|西雅图|纽约|racknerd"
+  filter: "(?i)US|美国|United States|洛杉矶|硅谷|达拉斯|西雅图|纽约"
   url: https://www.gstatic.com/generate_204
   interval: 600
   tolerance: 50
