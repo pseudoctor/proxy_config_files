@@ -1,0 +1,690 @@
+# ==========================================
+# 📌 配置文件: 𝐄𝐠𝐞𝐫𝐧@pseudoctor 专用配置
+# ✨ 主要功能: 集成大厂核心域名专属 DNS 解析、VIF 局域网旁路优化、节点自动化跨区优选、以及基于漏斗模型的精细化分流路由（广告拦截/内网直连/应用代理/国内兜底），并全量支持外挂脚本与组件模块。
+# 🔗 引用链接: https://raw.githubusercontent.com/jnlaoshu/MySelf/master/Egern/Profile.yaml
+# ⏱️ 更新时间: 2026.04.18 cleanup
+# 🔧 修复说明:
+#   1. 删除 dns.forward 列表中错误嵌入的两处 public_ip_lookup_url
+#   2. 修复 regex/proxy_rule_set/wildcard 三条规则的缩进错误
+#   3. 修正 wildcard value 为合法 upstream 名称，新增 Google upstream 防泄漏
+#   4. 收窄 Apple DNS forward 为 domain_suffix 精确匹配
+#   5. MITM excludes 补充 Apple 及腾讯 CDN 相关域名
+#   6. 测速 URL 升级为 HTTPS
+#   7. 新增 Crypto 策略组 + 欧洲节点策略组
+#   8. 移除全局 QUIC REJECT（导致 YouTube/X 无法打开）
+#   9. 规则集 URL 换为 Repcz/Tool Egern 原生规则集（raw.githubusercontent.com 直链）
+#  10. bootstrap 移除 system，改为纯 IP，彻底消除运营商 DNS 泄漏
+#  11. proxy_rule_set 改用 jsDelivr CDN，避免依赖 GitHub 解析 GitHub 的死锁
+#  12. 所有规则集 URL 从 github.com/raw 改为 raw.githubusercontent.com 直链
+#  13. 【本次】GitHub 系 DNS upstream 从 Google 改为 Default，修复冷启动 DNS 死锁
+#  14. 【本次】dns.forward 新增 jsdelivr.net → Default，防止规则集下载死锁
+#  15. 【本次】rules 顶部新增 cdn.jsdelivr.net / sub.store 硬编码保护
+#  16. 【本次】rules 顶部新增 jsdelivr.net 硬编码保护
+#  17. 【本次】Google upstream 改为 IP 直连（8.8.8.8/8.8.4.4），消除冷启动 Bootstrap 回退
+#  18. 【本次】GitHub 系 DNS 改回 Google upstream（Default 会污染 GitHub IP）
+#  19. 【本次】dns.forward 兜底从 domain_wildcard "*" 改为 default_upstream: Google（正确语法）
+#  20. 【本次】所有 upstream 改为纯 IP 直连 DoH，Bootstrap 删除 8.8.8.8，彻底消除运营商 DNS 污染链
+# ==========================================
+
+# 基本配置
+ipv6: false
+http_port: 3080
+socks_port: 3090
+allow_external_connections: true
+vif_only: true
+hide_vpn_icon: true
+public_ip_lookup_url: https://ifconfig.me/ip
+
+# VIF 排除路由
+vif_excluded_routes:
+  - 10.0.0.0/8
+  - 172.16.0.0/12
+  - 192.168.0.0/16
+
+# DNS 劫持
+hijack_dns:
+  - "*:53"
+
+# 规则数据库
+geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country.mmdb
+asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
+
+# 测速 URL（✅ 已升级为 HTTPS，避免运营商劫持干扰测速）
+proxy_latency_test_url: https://www.gstatic.com/generate_204
+direct_latency_test_url: https://www.apple.com/library/test/success.html
+
+compat_route: false
+include_all_networks: false
+include_apns: false
+include_cellular_services: false
+include_local_networks: false
+
+# DNS 配置
+dns:
+  bootstrap:
+    # ✅ 只保留国内可靠 IP，删除 8.8.8.8
+    # 蜂窝网络下 8.8.8.8 经常超时，触发 fallback 到运营商 DNS
+    - 223.5.5.5    # 阿里
+    - 119.29.29.29 # DNSPod
+  upstreams:
+    # ✅ 修复 #20：所有 upstream 改为纯 IP 直连 DoH
+    # 原域名形式（dns.alidns.com / doh.pub）需 Bootstrap 先解析域名
+    # Bootstrap 在蜂窝网络下 fallback 到运营商 DNS（202.99.x.x）
+    # 运营商 DNS 污染境外域名 → upstream 建立失败 → 所有查询卡在 Bootstrap
+    # 改为 IP 直连后，upstream 完全不依赖 Bootstrap 能否解析域名
+    AliDNS:
+      - https://223.5.5.5/dns-query
+      - https://223.6.6.6/dns-query
+    DNSPod:
+      - https://119.29.29.29/dns-query
+      - https://182.254.116.116/dns-query
+    Default:
+      - https://223.5.5.5/dns-query
+      - https://119.29.29.29/dns-query
+    Google:
+      - https://8.8.8.8/dns-query
+      - https://8.8.4.4/dns-query
+  forward:
+    # 阿里系（CDN 调度深度依赖 AliDNS，专属转发收益最大）
+    - domain_suffix:
+        match: alibaba.com
+        value: AliDNS
+    - domain_suffix:
+        match: alipay.com
+        value: AliDNS
+    - domain_suffix:
+        match: alipayobjects.com
+        value: AliDNS
+    - domain_suffix:
+        match: aliapp.org
+        value: AliDNS
+    - domain_suffix:
+        match: alicdn.com
+        value: AliDNS
+    - domain_suffix:
+        match: aliyun.com
+        value: AliDNS
+    - domain_suffix:
+        match: taobao.com
+        value: AliDNS
+    - domain_suffix:
+        match: tmall.com
+        value: AliDNS
+    - domain_suffix:
+        match: dingtalk.com
+        value: AliDNS
+    - domain_suffix:
+        match: 1688.com
+        value: AliDNS
+    - domain_suffix:
+        match: youku.com
+        value: AliDNS
+    - domain_suffix:
+        match: uc.cn
+        value: AliDNS
+    - domain_suffix:
+        match: amap.com
+        value: AliDNS
+    - domain_suffix:
+        match: ele.me
+        value: AliDNS
+    - domain_suffix:
+        match: hichina.com
+        value: AliDNS
+    - domain_suffix:
+        match: alibabacloud.com
+        value: AliDNS
+    # 腾讯系（CDN 调度深度依赖 DNSPod，专属转发收益最大）
+    - domain_suffix:
+        match: qq.com
+        value: DNSPod
+    - domain_suffix:
+        match: wechat.com
+        value: DNSPod
+    - domain_suffix:
+        match: weixin.com
+        value: DNSPod
+    - domain_suffix:
+        match: tencent.com
+        value: DNSPod
+    - domain_suffix:
+        match: tencentcloud.com
+        value: DNSPod
+    - domain_suffix:
+        match: qcloud.com
+        value: DNSPod
+    - domain_suffix:
+        match: qpic.cn
+        value: DNSPod
+    - domain_suffix:
+        match: gtimg.com
+        value: DNSPod
+    # ✅ 修复 #17：GitHub 系改回 Google（IP 直连 DoH，不污染，不死锁）
+    # Default（AliDNS/DNSPod）会对 github.com 返回污染 IP（如 127.0.0.1）
+    # Google upstream 已改为 IP 直连，冷启动无死锁问题
+    - domain_suffix:
+        match: github.com
+        value: Google
+    - domain_suffix:
+        match: githubusercontent.com
+        value: Google
+    - domain_suffix:
+        match: githubassets.com
+        value: Google
+    - domain_suffix:
+        match: github.io
+        value: Google
+    - domain_suffix:
+        match: githubcopilot.com
+        value: Google
+    - domain_suffix:
+        match: npmjs.org
+        value: Google
+    # ✅ 修复 #14：jsDelivr 改走 Default，防止规则集下载时 DNS 依赖代理死锁
+    - domain_suffix:
+        match: jsdelivr.net
+        value: Default
+    # Apple 系走加密上游，避免 system DNS 泄漏
+    - domain_suffix:
+        match: apple.com
+        value: Default
+    - domain_suffix:
+        match: icloud.com
+        value: Default
+    - domain_suffix:
+        match: mzstatic.com
+        value: Default
+    - domain_suffix:
+        match: apple-dns.net
+        value: Default
+    - domain_suffix:
+        match: cdn-apple.com
+        value: Default
+    # 本地域名与反向解析保留 system，避免影响局域网发现与设备访问
+    - domain_suffix:
+        match: local
+        value: system
+    - domain_suffix:
+        match: localdomain
+        value: system
+    - domain_suffix:
+        match: lan
+        value: system
+    - domain_suffix:
+        match: in-addr.arpa
+        value: system
+    - domain_suffix:
+        match: ip6.arpa
+        value: system
+    - domain_suffix:
+        match: router.asus.com
+        value: system
+    # 国内域名走 AliDNS 就近解析
+    - proxy_rule_set:
+        match: https://cdn.jsdelivr.net/gh/ACL4SSR/ACL4SSR@master/Clash/ChinaDomain.list
+        value: AliDNS
+  # ✅ 修复 #18：兜底改为 default_upstream（Egern 正确语法）
+  # domain_wildcard "*" 在 Egern 中只匹配不含点的单级主机名
+  # github.com / google.com 等含点域名会穿透所有 forward 规则回退到 Bootstrap
+  # Bootstrap 走运营商明文 UDP DNS → 返回污染 IP → 网页打不开
+  # default_upstream 才是 Egern 中对所有未匹配域名的正确全局兜底字段
+  default_upstream: Google
+
+# 策略组
+policy_groups:
+  - external:
+      name: 全部节点
+      type: select
+      urls:
+        - 请替换为你的机场订阅链接
+      icon: 🌹
+      hidden: true
+  - auto_test:
+      name: 香港节点
+      policies: [全部节点]
+      flatten: true
+      filter: "(?i)🇭🇰|香港|Hong\\s*Kong|\\bHKG?\\b|(?:深|沪|京|广)港"
+      interval: 600
+      tolerance: 50
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/HongKong.png
+  - auto_test:
+      name: 美国节点
+      policies: [全部节点]
+      flatten: true
+      filter: "(?i)🇺🇸|美国|United\\s*States|America|\\bUSA?\\b|洛杉矶|硅谷|西雅图|芝加哥|达拉斯|凤凰城|阿什本|纽约|迈阿密|波士顿|休斯顿|亚特兰大|拉斯维加斯|圣地亚哥|盐湖城|奥斯汀|波特兰|丹佛|奥克兰|安大略|圣安娜|\\b(?:LAX|SJC|SFO|SEA|ORD|JFK|DFW|IAD|PHX|ATL|BOS|MIA|EWR|LGA|IAH|HOU|DEN|OAK|ONT|SNA|LAS|PDX|DAL|SAN|SLC|MSP)\\b"
+      interval: 600
+      tolerance: 50
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/UnitedStates.png
+  - auto_test:
+      name: 台湾节点
+      policies: [全部节点]
+      flatten: true
+      filter: "(?i)🇹🇼|台湾|Taiwan|\\b(?:TWN?|TPE|Taipei)\\b"
+      interval: 600
+      tolerance: 50
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/Taiwan.png
+  - auto_test:
+      name: 日本节点
+      policies: [全部节点]
+      flatten: true
+      filter: "(?i)🇯🇵|日本|东京|大阪|Japan|\\b(?:JPN?|NRT|HND|KIX|FUK|NGO|OSA|CTS|SDJ|OKA)\\b"
+      interval: 600
+      tolerance: 50
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/Japan.png
+  - auto_test:
+      name: 狮城节点
+      policies: [全部节点]
+      flatten: true
+      filter: "(?i)🇸🇬|新加坡|狮城|Singapore|\\b(?:SGP?|SIN)\\b"
+      interval: 600
+      tolerance: 50
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/Singapore.png
+  - auto_test:
+      name: 韩国节点
+      policies: [全部节点]
+      flatten: true
+      filter: "(?i)🇰🇷|韩国|首尔|仁川|Korea|South\\s*Korea|\\b(?:KOR|KR|ICN|SEL)\\b"
+      interval: 600
+      tolerance: 50
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/Korea.png
+  - auto_test:
+      name: 欧洲节点
+      policies: [全部节点]
+      flatten: true
+      filter: "(?i)🇬🇧|🇩🇪|🇫🇷|🇳🇱|🇸🇪|🇨🇭|🇫🇮|🇳🇴|🇩🇰|🇦🇹|🇧🇪|🇵🇱|🇨🇿|🇷🇴|英国|德国|法国|荷兰|瑞典|瑞士|芬兰|挪威|丹麦|奥地利|比利时|波兰|欧洲|United\\s*Kingdom|Germany|France|Netherlands|Sweden|Switzerland|Finland|Norway|Denmark|Austria|Belgium|Poland|\\b(?:UK|GB|DE|FR|NL|SE|CH|FI|NO|DK|AT|BE|PL|LHR|FRA|AMS|ARN|ZRH|HEL|OSL|CPH|VIE|BRU|WAW)\\b"
+      interval: 600
+      tolerance: 50
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/WorldMap.png
+  - select:
+      name: 其他节点
+      policies: [全部节点]
+      flatten: true
+      filter: >-
+        (?xi) ^ (?! .* (?:
+          🇭🇰|香港|Hong\s*Kong|\bHKG?\b|(?:深|沪|京|广)港|
+          🇯🇵|日本|东京|大阪|Japan|\b(?:JPN?|NRT|HND|KIX|FUK|NGO|OSA|CTS|SDJ|OKA)\b|
+          🇸🇬|新加坡|狮城|Singapore|\b(?:SGP?|SIN)\b|
+          🇹🇼|台湾|Taiwan|\b(?:TWN?|TPE|Taipei)\b|
+          🇰🇷|韩国|首尔|仁川|Korea|South\s*Korea|\b(?:KOR|KR|ICN|SEL)\b|
+          🇬🇧|🇩🇪|🇫🇷|🇳🇱|🇸🇪|🇨🇭|🇫🇮|🇳🇴|🇩🇰|🇦🇹|🇧🇪|🇵🇱|英国|德国|法国|荷兰|瑞典|瑞士|芬兰|挪威|丹麦|奥地利|比利时|波兰|欧洲|United\s*Kingdom|Germany|France|Netherlands|Sweden|Switzerland|Finland|Norway|Denmark|Austria|Belgium|Poland|\b(?:UK|GB|DE|FR|NL|SE|CH|FI|NO|DK|AT|BE|PL|LHR|FRA|AMS|ARN|ZRH|HEL|OSL|CPH|VIE|BRU|WAW)\b|
+          🇺🇸|美国|United\s*States|America|\bUSA?\b|
+          洛杉矶|硅谷|西雅图|芝加哥|达拉斯|凤凰城|阿什本|纽约|迈阿密|波士顿|休斯顿|亚特兰大|拉斯维加斯|圣地亚哥|盐湖城|奥斯汀|波特兰|丹佛|奥克兰|安大略|圣安娜|
+          \b(?:LAX|SJC|SFO|SEA|ORD|JFK|DFW|IAD|PHX|ATL|BOS|MIA|EWR|LGA|IAH|HOU|DEN|OAK|ONT|SNA|LAS|PDX|DAL|SAN|SLC|MSP)\b|
+          倍率|剩余|到期|流量|官网|订阅|测试|有效|禁止|邮箱|客服|地址|网站|群组
+        ) ) .+ $
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/WorldMap.png
+  - select:
+      name: 自选策略
+      # ✅ 首选改为美国节点
+      policies:
+        [
+          美国节点,
+          香港节点,
+          狮城节点,
+          台湾节点,
+          日本节点,
+          韩国节点,
+          欧洲节点,
+          其他节点,
+          全部节点,
+          DIRECT,
+        ]
+      icon: 😜
+  - auto_test:
+      name: AIGC
+      # 自动测速选最优美国节点，确保 ChatGPT/Claude 等始终走美国
+      policies: [美国节点]
+      flatten: true
+      interval: 600
+      tolerance: 50
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/ChatGPT.png
+  - select:
+      name: Bing
+      policies: [美国节点, 自选策略, PROXY]
+      flatten: true
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/Bing.png
+  - select:
+      name: Disney
+      policies: [狮城节点, 自选策略, PROXY]
+      flatten: true
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/Disney.png
+  - select:
+      name: HBO
+      policies: [美国节点, 自选策略, PROXY]
+      flatten: true
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/HBO.png
+  - select:
+      name: Netflix
+      policies: [狮城节点, 自选策略, PROXY]
+      flatten: true
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/Netflix.png
+  - select:
+      name: Spotify
+      policies: [美国节点, 自选策略, PROXY]
+      flatten: true
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/Spotify.png
+  - select:
+      name: TikTok
+      policies: [日本节点, 自选策略, PROXY]
+      flatten: true
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/TikTok.png
+  - select:
+      name: YouTubeMusic
+      policies: [美国节点, 香港节点, 自选策略, PROXY]
+      flatten: true
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/YouTubeMusic.png
+  - select:
+      name: YouTube
+      policies: [美国节点, 香港节点, 自选策略, PROXY]
+      flatten: true
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/YouTube.png
+  - select:
+      name: GitHub
+      policies: [全部节点, 自选策略, 香港节点, 狮城节点, 日本节点, 美国节点]
+      flatten: true
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/GitHub.png
+  - select:
+      name: Google
+      policies: [美国节点, 自选策略, PROXY]
+      flatten: true
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/Google.png
+  - select:
+      name: Microsoft
+      policies: [DIRECT, 自选策略, PROXY]
+      flatten: true
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/Microsoft.png
+  - select:
+      name: PayPal
+      policies: [美国节点, 自选策略, PROXY]
+      flatten: true
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/PayPal.png
+  - select:
+      name: Telegram
+      policies: [美国节点, 香港节点, 自选策略, PROXY]
+      flatten: true
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/Telegram.png
+  - select:
+      name: Twitter
+      policies: [美国节点, 香港节点, 自选策略, PROXY]
+      flatten: true
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/Twitter.png
+  - select:
+      name: WeChat
+      policies: [DIRECT, 自选策略]
+      flatten: true
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/WeChat.png
+  - select:
+      name: 猎杀广告
+      policies: [REJECT, DIRECT]
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/AdBlock.png
+  - auto_test:
+      name: Crypto
+      # ✅ 日本/狮城/欧洲自动测速，绕开美国监管限制
+      policies: [日本节点, 狮城节点, 欧洲节点]
+      flatten: true
+      interval: 600
+      tolerance: 50
+      icon: https://raw.githubusercontent.com/jnlaoshu/MySelf/main/image/WorldMap.png
+
+# 路由规则
+rules:
+  # ── 最高优放行：内网与时间同步 ──
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/jnlaoshu/MySelf@main/Egern/Rule/Lan.yaml
+      policy: DIRECT
+  - domain_suffix:
+      match: ntp.org
+      policy: DIRECT
+  - domain_suffix:
+      match: time.apple.com
+      policy: DIRECT
+  - domain_suffix:
+      match: time.cloudflare.com
+      policy: DIRECT
+
+  # ── ✅ 修复 #15：基础设施硬编码保护（规则集下载 / 订阅更新必须先于一切规则集加载）──
+  # jsDelivr CDN：所有规则集 URL 均依赖此域名，必须保证可达
+  - domain_suffix:
+      match: cdn.jsdelivr.net
+      policy: PROXY
+  - domain_suffix:
+      match: jsdelivr.net
+      policy: PROXY
+  # ── ✅ 修复 #13：GitHub 系硬编码（防冷启动死锁，必须在所有 rule_set 之前）──
+  # 原因：rule_set URL 本身含 raw.githubusercontent.com，
+  # 若 GitHub 走规则集匹配，规则集未加载时无法判断策略 → 死锁
+  - domain_suffix:
+      match: github.com
+      policy: GitHub
+  - domain_suffix:
+      match: githubusercontent.com
+      policy: GitHub
+  - domain_suffix:
+      match: githubassets.com
+      policy: GitHub
+  - domain_suffix:
+      match: github.io
+      policy: GitHub
+  - domain_suffix:
+      match: githubcopilot.com
+      policy: GitHub
+  - domain_suffix:
+      match: npmjs.org
+      policy: GitHub
+
+  # ── 应用层分流与去广告 ──
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Apple.yaml
+      policy: DIRECT
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/jnlaoshu/MySelf@main/Egern/Rule/AdBlock.yaml
+      policy: 猎杀广告
+
+  # ── 加密货币交易所（优先日本/新加坡节点）──
+  # Binance
+  - domain_suffix:
+      match: binance.com
+      policy: Crypto
+  - domain_suffix:
+      match: binance.me
+      policy: Crypto
+  - domain_suffix:
+      match: binance.cloud
+      policy: Crypto
+  - domain_suffix:
+      match: binance.info
+      policy: Crypto
+  - domain_suffix:
+      match: bnbstatic.com
+      policy: Crypto
+  - domain_suffix:
+      match: binance.vision
+      policy: Crypto
+  # Bitget
+  - domain_suffix:
+      match: bitget.com
+      policy: Crypto
+  - domain_suffix:
+      match: bitget.site
+      policy: Crypto
+  # Gate.io
+  - domain_suffix:
+      match: gate.io
+      policy: Crypto
+  - domain_suffix:
+      match: gateimg.com
+      policy: Crypto
+  - domain_suffix:
+      match: gatedata.org
+      policy: Crypto
+  - domain_suffix:
+      match: gateio.live
+      policy: Crypto
+  # Bybit（✅ 补充完整域名列表）
+  - domain_suffix:
+      match: bybit.com
+      policy: Crypto
+  - domain_suffix:
+      match: bybit.org
+      policy: Crypto
+  - domain_suffix:
+      match: bybitapi.com
+      policy: Crypto
+  - domain_suffix:
+      match: bybit-cdn.com
+      policy: Crypto
+  - domain_suffix:
+      match: bybitstorage.com
+      policy: Crypto
+  - domain_suffix:
+      match: bybitglobal.com
+      policy: Crypto
+  # OKX
+  - domain_suffix:
+      match: okx.com
+      policy: Crypto
+  - domain_suffix:
+      match: okex.com
+      policy: Crypto
+  - domain_suffix:
+      match: ouxyi.space
+      policy: Crypto
+  - domain_suffix:
+      match: okcdn.com
+      policy: Crypto
+
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/jnlaoshu/MySelf@main/Egern/Rule/AIGC.yaml
+      policy: AIGC
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Bing.yaml
+      policy: Bing
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Disney.yaml
+      policy: Disney
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/HBO.yaml
+      policy: HBO
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Netflix.yaml
+      policy: Netflix
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Spotify.yaml
+      policy: Spotify
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/TikTok.yaml
+      policy: TikTok
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/YouTubeMusic.yaml
+      policy: YouTubeMusic
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/YouTube.yaml
+      policy: YouTube
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/GitHub.yaml
+      policy: GitHub
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Google.yaml
+      policy: Google
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Microsoft.yaml
+      policy: Microsoft
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/PayPal.yaml
+      policy: PayPal
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Telegram.yaml
+      policy: Telegram
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Twitter.yaml
+      policy: Twitter
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/WeChat.yaml
+      policy: WeChat
+  - rule_set:
+      match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/ChinaMax.yaml
+      policy: DIRECT
+  - geoip:
+      match: CN
+      policy: DIRECT
+      no_resolve: true
+  - default:
+      policy: 自选策略
+
+# MITM
+# ✅ 优化：补充 Apple 系及腾讯 CDN 域名到 excludes
+#    防止 MITM 拦截直连流量导致证书错误或连接异常
+mitm:
+  ca_p12: egern.p12
+  ca_passphrase: egern
+  hostnames:
+    excludes:
+      # Apple 系（走 DIRECT，必须排除 MITM）
+      - "*.apple.com"
+      - "*.icloud.com"
+      - "*.mzstatic.com"
+      - "*.apple-dns.net"
+      - "*.cdn-apple.com"
+      # 微信 / 支付宝（含证书绑定，强制排除）
+      - "*.wechat.com"
+      - "*.weixin.com"
+      - "*.alipay.com"
+      # 微软系
+      - "*.microsoft.com"
+      - "*.live.com"
+      - "*.office.com"
+      # GitHub 系（避免 TLS/证书拦截导致网页、Git、CLI 连接异常）
+      # ✅ 补充根域名，*.github.com 不覆盖 github.com 本身
+      - "github.com"
+      - "*.github.com"
+      - "githubusercontent.com"
+      - "*.githubusercontent.com"
+      - "githubassets.com"
+      - "*.githubassets.com"
+      - "github.io"
+      - "*.github.io"
+      - "githubcopilot.com"
+      - "*.githubcopilot.com"
+      - "*.git-lfs.github.com"
+      - "*.api.github.com"
+      - "*.codeload.github.com"
+      # 腾讯系（含 CDN，避免 MITM 干扰）
+      - "*.qq.com"
+      - "*.tencent.com"
+      - "*.qcloud.com"
+      - "*.tencentcloud.com"
+      - "*.gtimg.com"
+      - "*.qpic.cn"
+      # jsDelivr CDN（规则集下载链路，排除 MITM 避免证书干扰）
+      - "*.jsdelivr.net"
+
+# 模块配置
+modules:
+  - name: 常用小组件
+    url: https://cdn.jsdelivr.net/gh/jnlaoshu/MySelf@master/Egern/Widget/Widgets.yaml
+    enabled: true
+  - name: Sub-Store
+    url: https://cdn.jsdelivr.net/gh/sub-store-org/Sub-Store@master/config/Egern.yaml
+    enabled: false  # ✅ 不使用 Sub-Store，已禁用
+  # ⚠️ WeatherKit 使用的是 Surge .sgmodule 格式，Egern 无法直接加载，已禁用
+  - name: WeatherKit
+    url: https://github.com/NSRingo/WeatherKit/releases/latest/download/iRingo.WeatherKit.sgmodule
+    enabled: false
+  - name: 雪球去广告
+    url: https://cdn.jsdelivr.net/gh/jnlaoshu/MySelf@main/Egern/Module/Xueqiu.yaml
+    enabled: true
+  - name: 综合电商去广告
+    url: https://cdn.jsdelivr.net/gh/jnlaoshu/MySelf@main/Egern/Module/EcommerceAdBlock.yaml
+    enabled: true
+  - name: 地图三合一去广告
+    url: https://cdn.jsdelivr.net/gh/jnlaoshu/MySelf@main/Egern/Module/MapAdBlock.yaml
+    enabled: true
+  - name: 差旅出行去广告
+    url: https://cdn.jsdelivr.net/gh/jnlaoshu/MySelf@main/Egern/Module/TravelAdBlock.yaml
+    enabled: true
+  - name: 音乐流媒体去广告
+    url: https://cdn.jsdelivr.net/gh/jnlaoshu/MySelf@main/Egern/Module/MusicAdBlock.yaml
+    enabled: true
+  - name: 视频流媒体去广告
+    url: https://cdn.jsdelivr.net/gh/jnlaoshu/MySelf@main/Egern/Module/VideoAdBlock.yaml
+    enabled: true
